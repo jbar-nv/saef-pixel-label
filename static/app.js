@@ -589,6 +589,13 @@ function renderCanvas() {
   drawPixelMarkers();
 }
 
+let canvasRenderFrame = 0;
+
+function scheduleCanvasRender() {
+  window.cancelAnimationFrame(canvasRenderFrame);
+  canvasRenderFrame = window.requestAnimationFrame(() => renderCanvas());
+}
+
 function drawPixelMarkers() {
   const pixels = state.pixels;
   const scale = state.scale;
@@ -1282,6 +1289,10 @@ els.canvasFrame.addEventListener("pointerup", endPan);
 els.canvasFrame.addEventListener("pointercancel", endPan);
 els.canvasFrame.addEventListener("wheel", wheelZoom, { passive: false });
 els.canvasFrame.addEventListener("click", (event) => handleCanvasClick(event).catch(reportError));
-window.addEventListener("resize", () => renderCanvas());
+window.addEventListener("resize", scheduleCanvasRender);
+if ("ResizeObserver" in window) {
+  const canvasObserver = new ResizeObserver(scheduleCanvasRender);
+  canvasObserver.observe(els.canvasFrame);
+}
 
 initializeApp().catch(reportError);

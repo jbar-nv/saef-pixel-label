@@ -7,3 +7,4 @@ data/annotations.sqlite3-*
 data/*.log
 data/images/*
 !data/images/.gitkeep
+.vscode/

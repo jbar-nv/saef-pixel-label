@@ -92,15 +92,16 @@ h2 {
 }
 
 .workspace {
-  min-height: calc(100vh - 72px);
+  width: 100%;
+  min-height: calc(100dvh - 72px);
   display: grid;
   grid-template-areas: "sidebar stage inspector";
-  grid-template-columns: minmax(340px, 380px) minmax(260px, clamp(300px, 42vw, 720px)) minmax(300px, 330px);
+  grid-template-columns: minmax(340px, 380px) minmax(260px, 1fr) minmax(300px, 330px);
   gap: 18px;
   padding: 14px;
   overflow: visible;
   align-items: start;
-  justify-content: center;
+  justify-content: stretch;
 }
 
 .sidebar,
@@ -147,7 +148,7 @@ h2 {
   grid-area: stage;
   position: relative;
   min-width: 0;
-  height: calc(100vh - 100px);
+  height: calc(100dvh - 100px);
   min-height: 520px;
   max-width: 100%;
   display: grid;
@@ -350,8 +351,13 @@ h2 {
 }
 
 .compact-field {
-  grid-template-columns: 58px 1fr;
+  min-width: 0;
+  grid-template-columns: 58px minmax(0, 1fr);
   align-items: center;
+}
+
+.compact-field > * {
+  min-width: 0;
 }
 
 .button {
@@ -408,11 +414,13 @@ h2 {
 }
 
 .modal {
+  min-width: 0;
   width: min(460px, calc(100vw - 32px));
   padding: 0;
   border: 1px solid var(--line);
   border-radius: 8px;
   box-shadow: var(--shadow);
+  overflow: hidden;
 }
 
 .modal::backdrop {
@@ -420,10 +428,16 @@ h2 {
 }
 
 .modal-panel {
+  min-width: 0;
   display: grid;
   gap: 12px;
   padding: 14px;
   background: var(--surface);
+}
+
+.modal-panel input,
+.modal-panel select {
+  max-width: 100%;
 }
 
 .modal-panel input[type="file"] {
@@ -681,7 +695,7 @@ h2 {
     grid-template-areas:
       "sidebar stage"
       "inspector inspector";
-    grid-template-columns: minmax(340px, 380px) minmax(260px, clamp(280px, 44vw, 620px));
+    grid-template-columns: minmax(340px, 380px) minmax(260px, 1fr);
     grid-template-rows: auto auto;
   }
 
@@ -690,9 +704,25 @@ h2 {
   }
 }
 
+@media (max-width: 1040px) {
+  .topbar {
+    grid-template-columns: 1fr auto;
+  }
+
+  .user-picker {
+    grid-column: 1 / -1;
+    width: min(100%, 560px);
+  }
+
+  .export-actions {
+    justify-self: end;
+  }
+}
+
 @media (max-width: 820px) {
   .topbar {
     grid-template-columns: 1fr;
+    gap: 10px;
   }
 
   .workspace {
@@ -702,6 +732,8 @@ h2 {
       "inspector";
     grid-template-columns: 1fr;
     grid-template-rows: auto minmax(320px, 1fr) auto;
+    gap: 10px;
+    padding: 10px;
   }
 
   .inspector {
@@ -710,7 +742,15 @@ h2 {
   }
 
   .stage {
-    grid-template-rows: auto minmax(320px, 58vh);
+    height: auto;
+    min-height: 0;
+    grid-template-rows: auto auto;
+    overflow: visible;
+  }
+
+  .canvas-frame {
+    height: min(58dvh, 520px);
+    min-height: 320px;
   }
 
   .stage-toolbar {
@@ -726,5 +766,67 @@ h2 {
   .sample-form input,
   .sample-form .button {
     flex: 1;
+  }
+
+  .image-list,
+  .pixel-list {
+    max-height: none;
+  }
+}
+
+@media (max-width: 560px) {
+  .topbar {
+    padding: 10px;
+  }
+
+  .brand {
+    align-items: flex-start;
+  }
+
+  .user-picker {
+    width: 100%;
+    grid-template-columns: 1fr;
+  }
+
+  .user-picker .button {
+    width: 100%;
+  }
+
+  .export-actions {
+    width: 100%;
+  }
+
+  .export-actions .button {
+    flex: 1;
+  }
+
+  .panel {
+    padding: 10px;
+  }
+
+  .canvas-content {
+    padding: 18px;
+  }
+
+  .canvas-frame {
+    height: 54dvh;
+    min-height: 300px;
+  }
+
+  .modal {
+    width: min(300px, calc(100vw - 32px));
+    max-width: calc(100vw - 32px);
+  }
+
+  .compact-field {
+    grid-template-columns: 1fr;
+  }
+
+  .settings-form {
+    grid-template-columns: minmax(0, 1fr) 36px;
+  }
+
+  .settings-form .form-caption {
+    grid-column: 1 / -1;
   }
 }
