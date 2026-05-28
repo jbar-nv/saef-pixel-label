@@ -1,0 +1,210 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>SAEF Pixel Annotation</title>
+    <link rel="stylesheet" href="/styles.css">
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar">
+        <div class="brand">
+          <span class="brand-mark"></span>
+          <div>
+            <h1>SAEF Pixel Annotation</h1>
+            <span id="connectionStatus">Local workspace</span>
+          </div>
+        </div>
+        <div class="user-field user-picker">
+          <label>
+            <select id="usernameInput" class="dataset-select"></select>
+          </label>
+          <button id="userSettingsButton" class="button secondary" type="button">Settings</button>
+        </div>
+        <div class="export-actions">
+          <a id="jsonExport" class="button secondary" href="#" download>JSON</a>
+          <a id="csvExport" class="button secondary" href="#" download>CSV</a>
+        </div>
+      </header>
+
+      <main class="workspace">
+        <aside class="sidebar">
+          <section class="panel">
+            <div class="panel-heading">
+              <h2>Dataset</h2>
+              <span id="datasetImageCount" class="pill">0</span>
+            </div>
+            <select id="datasetSelect" class="dataset-select"></select>
+            <form id="datasetRenameForm" class="dataset-form">
+              <input id="datasetRenameInput" type="text" placeholder="dataset name">
+              <button class="button square" type="submit" title="Rename dataset">OK</button>
+            </form>
+            <form id="datasetForm" class="dataset-form">
+              <input id="datasetNameInput" type="text" placeholder="new dataset">
+              <button class="button square" type="submit" title="Add dataset">+</button>
+            </form>
+          </section>
+
+          <section class="panel">
+            <div class="panel-heading">
+              <h2>Import</h2>
+            </div>
+            <form id="uploadForm" class="upload-form">
+              <input id="imageInput" type="file" name="image" accept="image/*">
+              <input id="imageNameInput" type="text" name="name" placeholder="Dataset image name">
+              <label class="compact-field">
+                <span>Pixels</span>
+                <input id="pixelCountInput" type="number" min="0" max="10000" value="25">
+              </label>
+              <div class="button-row">
+                <button class="button primary" type="submit">Upload</button>
+                <button id="batchUploadButton" class="button secondary" type="button">Batch</button>
+              </div>
+            </form>
+          </section>
+
+          <section class="panel image-panel">
+            <div class="panel-heading">
+              <h2>Images</h2>
+              <span id="imageCount" class="pill">0</span>
+            </div>
+            <div id="imageList" class="image-list"></div>
+          </section>
+
+          <section class="panel">
+            <div class="panel-heading">
+              <h2>Labels</h2>
+            </div>
+            <form id="categoryForm" class="category-form">
+              <input id="categoryNameInput" type="text" placeholder="new label">
+              <input id="categoryColorInput" type="color" value="#0f8f7a" title="Label color">
+              <button class="button square" type="submit" title="Add label">+</button>
+            </form>
+            <div id="categoryLegend" class="legend"></div>
+          </section>
+        </aside>
+
+        <section class="stage">
+          <div class="stage-toolbar">
+              <div class="tool-group">
+                <button id="prevPixelButton" class="button square" title="Previous target pixel">&lt;</button>
+                <button id="nextPixelButton" class="button square" title="Next target pixel">&gt;</button>
+                <button id="zoomOutButton" class="button square" title="Zoom out">-</button>
+                <button id="zoomResetButton" class="button secondary" title="Fit image">Fit</button>
+                <button id="zoomInButton" class="button square" title="Zoom in">+</button>
+              <span id="zoomLevel" class="pill">100%</span>
+              <button id="editPixelsButton" class="button secondary" title="Move selected target pixels and clear their annotations">Edit</button>
+              <button id="resetAnnotationsButton" class="button secondary" title="Reset target pixels and annotations for this image">Reset</button>
+            </div>
+            <form id="sampleForm" class="sample-form">
+              <input id="sampleCountInput" type="number" min="1" max="10000" value="25">
+              <button class="button secondary" type="submit">Sample</button>
+            </form>
+          </div>
+          <div id="canvasFrame" class="canvas-frame">
+            <div id="canvasContent" class="canvas-content">
+              <canvas id="imageCanvas"></canvas>
+            </div>
+            <div id="emptyState" class="empty-state">No image loaded</div>
+          </div>
+        </section>
+
+        <aside class="inspector">
+          <section class="panel">
+            <div class="panel-heading">
+              <h2>Current</h2>
+              <span id="pixelPosition" class="pill">-</span>
+            </div>
+            <div class="progress-shell">
+              <div id="progressBar" class="progress-bar"></div>
+            </div>
+            <div id="progressText" class="meta-line">0 / 0</div>
+            <div id="categoryButtons" class="category-buttons"></div>
+          </section>
+
+          <section class="panel">
+            <div class="panel-heading">
+              <h2>Distribution</h2>
+              <span id="voteTotal" class="pill">0 votes</span>
+            </div>
+            <div id="distributionList" class="distribution-list"></div>
+          </section>
+
+          <section class="panel pixel-panel">
+            <div class="panel-heading">
+              <h2>Pixels</h2>
+              <span id="pixelCount" class="pill">0</span>
+            </div>
+            <div id="pixelList" class="pixel-list"></div>
+          </section>
+        </aside>
+      </main>
+    </div>
+
+    <dialog id="batchUploadDialog" class="modal">
+      <form id="batchUploadForm" class="modal-panel">
+        <div class="panel-heading">
+          <h2>Batch Upload</h2>
+          <button id="batchCloseButton" class="button square" type="button" title="Close">x</button>
+        </div>
+        <input id="batchImageInput" type="file" accept="image/*" multiple>
+        <label class="compact-field">
+          <span>Pixels</span>
+          <input id="batchPixelCountInput" type="number" min="0" max="10000" value="25">
+        </label>
+        <div class="button-row">
+          <button class="button primary" type="submit">Upload</button>
+        </div>
+      </form>
+    </dialog>
+
+    <dialog id="userDialog" class="modal">
+      <form id="userForm" class="modal-panel">
+        <div class="panel-heading">
+          <h2>Choose User</h2>
+        </div>
+        <label class="compact-field">
+          <span>User</span>
+          <select id="userSelect" class="dataset-select"></select>
+        </label>
+        <label class="compact-field">
+          <span>New</span>
+          <input id="userCreateInput" type="text" autocomplete="off" spellcheck="false" placeholder="new username">
+        </label>
+        <div class="button-row">
+          <button class="button primary" type="submit">Continue</button>
+        </div>
+      </form>
+    </dialog>
+
+    <dialog id="userSettingsDialog" class="modal">
+      <div class="modal-panel">
+        <div class="panel-heading">
+          <h2>User Settings</h2>
+          <button id="userSettingsCloseButton" class="button square" type="button" title="Close">x</button>
+        </div>
+        <form id="userAddForm" class="settings-form">
+          <span class="form-caption">User name</span>
+          <input id="userAddInput" type="text" autocomplete="off" spellcheck="false" placeholder="new username">
+          <button class="button square" type="submit" title="Add user">+</button>
+        </form>
+        <label class="compact-field">
+          <span>User</span>
+          <select id="userSettingsSelect" class="dataset-select"></select>
+        </label>
+        <form id="userRenameForm" class="settings-form">
+          <span class="form-caption">Rename</span>
+          <input id="userRenameInput" type="text" autocomplete="off" spellcheck="false" placeholder="username">
+          <button class="button square" type="submit" title="Rename user">OK</button>
+        </form>
+        <div class="button-row">
+          <button id="userDeleteButton" class="button danger" type="button">Delete</button>
+        </div>
+      </div>
+    </dialog>
+
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+    <script src="/app.js"></script>
+  </body>
+</html>
